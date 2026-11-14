@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>AKBAR MEGA APP - SAREZ VIDEO</title>
+<style>
+*{box-sizing:border-box}
+body{background:#0f0f2d;color:white;font-family:Arial;text-align:center;margin:0;padding:10px}
+.lang button{padding:9px 10px;margin:3px;background:white;border:none;border-radius:20px;cursor:pointer;font-weight:bold;font-size:13px}
+.lang button.active{background:gold;transform:scale(1.1)}
+.top button{padding:13px 11px;margin:4px;background:gold;border:none;border-radius:12px;font-size:13px;cursor:pointer;font-weight:bold}
+.box{display:none;width:100%;max-width:680px;margin:auto;background:white;color:black;border-radius:18px;padding:15px;text-align:left}
+.box.active{display:block}
+#chat{height:200px;overflow-y:auto;border:1px solid #ddd;padding:8px;border-radius:10px;background:#fafafa}
+.msg{padding:8px;margin:5px;border-radius:10px}
+.user{background:#d1e7ff;text-align:right}
+.ai{background:#ffe9a8}
+input{width:100%;padding:12px;margin:6px 0;border-radius:10px;border:1px solid #ccc;font-size:16px}
+.btn{background:#ff5e8a;color:white;border:none;padding:13px;border-radius:12px;cursor:pointer;font-size:17px;width:100%}
+.btn2{background:#00c853}
+.btnVoice{background:#7c4dff;color:white;border:none;padding:10px 14px;border-radius:10px;cursor:pointer;font-size:15px;margin:4px 2px}
+.btnVoiceStop{background:#ff1744;color:white}
+#gameArea{height:250px;background:linear-gradient(#1a1a4d,#000);position:relative;overflow:hidden;border-radius:12px}
+.star{position:absolute;font-size:38px;cursor:pointer}
+.slide{border:3px solid gold;padding:18px;margin:14px 0;border-radius:14px;background:#fff8d6}
+.slide h2{color:#d50000;margin:0 0 8px 0}
+.slide.active-slide{border-color:#00c853;box-shadow:0 0 20px #00e676}
+</style>
+</head>
+<body>
+<h1>💎 AKBAR MEGA APP - SAREZ</h1>
+<p>Ҳар як қисмро бо овоз номбар мекунад!</p>
+
+<div class="lang">
+<button onclick="setLang('tj')" id="b_tj" class="active">🇹🇯 Тоҷикӣ</button>
+<button onclick="setLang('ru')" id="b_ru">🇷🇺 Русский</button>
+<button onclick="setLang('en')" id="b_en">🇺🇸 English</button>
+<button onclick="setLang('uz')" id="b_uz">🇺🇿 O'zbek</button>
+<button onclick="setLang('fa')" id="b_fa">🇮🇷 فارسی</button>
+<button onclick="setLang('tr')" id="b_tr">🇹🇷 Türkçe</button>
+<button onclick="setLang('zh')" id="b_zh">🇨🇳 中文</button>
+</div>
+
+<div class="top">
+<button onclick="show('ai')">🤖 AI</button>
+<button onclick="show('math')">🧮 Масъала</button>
+<button onclick="show('game')">🎮 Бозӣ</button>
+<button onclick="show('prez')">📊 Презентатсия</button>
+<button onclick="show('sarez')" style="background:#00e5ff">🏔️ САРЕЗ 🔊</button>
+</div>
+
+<div id="sarez" class="box">
+<h2>🏔️ КӮЛИ САРЕЗ - БО ОВОЗ 🔊</h2>
+<button class="btn" style="background:#00b0ff" onclick="makeSarez()">🏔️ ПРЕЗЕНТАТСИЯИ САРЕЗРО СОЗДАН ✨</button>
+<div style="text-align:center;margin-top:10px">
+<button class="btnVoice" onclick="playAll()">▶️ ҲАМАШРО БО ОВОЗ ХОН! 🔊</button>
+<button class="btnVoice btnVoiceStop" onclick="stopVoice()">⏹️ ИСТ!</button>
+</div>
+<div id="sarezOut"></div>
+<button class="btn btn2" onclick="window.print()" style="margin-top:8px">🖨️ Чоп / PDF</button>
+</div>
+
+<div id="ai" class="box active">
+<h2>🤖 AI - Савол пурс!</h2>
+<div id="chat"><div class="msg ai">🤖 Салом Акбар! Савол пурс!</div></div>
+<input id="q" placeholder="Савол... Кӯли Сарез чист?" onkeydown="if(event.key=='Enter')askAI()">
+<button class="btn" onclick="askAI()">Фирист ▶</button>
+<button class="btnVoice" onclick="speak(document.getElementById('chat').lastChild.innerText)">🔊 Ҷавоби охиринро гӯш кун</button>
+</div>
+
+<div id="math" class="box">
+<h2>🧮 Масъаларо ҳал кун</h2>
+<input id="m" placeholder="25*4+10">
+<button class="btn" onclick="solveMath()">ҲАЛ КУН!</button>
+<div id="mRes" style="font-size:22px;margin-top:12px"></div>
+</div>
+
+<div id="game" class="box">
+<h2>🎮 Шикори Ситора - Хол: <span id="sc">0</span></h2>
+<div id="gameArea"></div><br>
+<button class="btn btn2" onclick="startGame()">▶ ОҒОЗ</button>
+<p>⭐ = +10, 💣 = -20</p>
+</div>
+
+<div id="prez" class="box">
+<h2>📊 Презентатсия</h2>
+<input id="tema" placeholder="Мавзӯъ: Компютер">
+<button class="btn" onclick="makePrez()">СОЗДАН ✨</button>
+<div id="prezOut"></div>
+</div>
+
+<script>
+let LANG='tj';
+let VOICE_LANG={tj:'tg-TJ',ru:'ru-RU',en:'en-US',uz:'uz-UZ',fa:'fa-IR',tr:'tr-TR',zh:'zh-CN'};
+function getVoiceLang(){ return VOICE_LANG[LANG] || 'ru-RU'; }
+function speak(text){
+  if(!('speechSynthesis' in window)){ alert('Овоз дар ин браузер нест! Chrome-ро истифода бар!'); return; }
+  window.speechSynthesis.cancel();
+  let clean=text.replace(/[🏔️🗺️📅🧱💧🦅🌸⚠️🛰️💡✈️❤️🤖⭐💣📊🎮🧮▶️🔊]/g,'').replace(/<[^>]*>/g,' ');
+  let u=new SpeechSynthesisUtterance(clean);
+  u.lang=getVoiceLang(); u.rate=0.9; u.pitch=1;
+  let voices=window.speechSynthesis.getVoices();
+  let v=voices.find(v=>v.lang.startsWith(getVoiceLang().split('-')[0]));
+  if(v) u.voice=v;
+  window.speechSynthesis.speak(u);
+}
+function stopVoice(){ playingAll=false; window.speechSynthesis.cancel(); }
+function setLang(l){ LANG=l; document.querySelectorAll('.lang button').forEach(b=>b.classList.remove('active')); document.getElementById('b_'+l).classList.add('active'); if(l=='fa') document.body.style.direction='rtl'; else document.body.style.direction='ltr'; stopVoice(); }
+function show(id){ document.querySelectorAll('.box').forEach(b=>b.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+let SAREZ_DATA=[
+ {t:'1. КӮЛИ САРЕЗ', d:'Марвориди Помир.<br><b>Акбар Махмадмурод</b><br>Соли 2026.', voice:'Кӯли Сарез. Марвориди Помир. Акбар Махмадмурод. Соли 2026.'},
+ {t:'2. ҶОЙГИРШАВӢ', d:'Вилояти Бадахшон, ноҳияи Рӯшон. Баландӣ 3252 метр. Дарозӣ 60 километр. Чуқурӣ 500 метр.', voice:'Ҷойгиршавӣ. Вилояти Бадахшон, ноҳияи Рӯшон. Баландӣ 3252 метр. Дарозӣ 60 километр. Чуқурӣ 500 метр.'},
+ {t:'3. ТАЪРИХИ ПАЙДОИШ', d:'18 феврали 1911. Заминларзаи 9 балл. Кӯҳи Усой фурӯ рехт. Дарёи Мурғоб баста шуд.', voice:'Таърихи пайдоиш. 18 феврали соли 1911. Заминларзаи 9 балл. Кӯҳи Усой фурӯ рехт. Дарёи Мурғоб баста шуд.'},
+ {t:'4. САРБАНДИ УСОЙ', d:'Баландӣ 567 метр. Дарозӣ 5 километр. Баландтарин сарбанди табиӣ дар дунё!', voice:'Сарбанди Усой. Баландӣ 567 метр. Баландтарин сарбанди табиӣ дар дунё!'},
+ {t:'5. ОБИ КӮЛ', d:'Ҳаҷм 17 миллиард метри мукааб. Майдон 80 километри мураббаъ. Оби тоза ва кабуд.', voice:'Оби кӯл. Ҳаҷм 17 миллиард метри мукааб. Оби тоза ва кабуд.'},
+ {t:'6. ҲАЙВОНОТ', d:'Гӯсфанди Марко Поло. Бабри барфӣ. Хирси қаҳваранг. Уқоб, шоҳин. Моҳӣ.', voice:'Ҳайвонот. Гӯсфанди Марко Поло. Бабри барфӣ. Хирси қаҳваранг. Уқоб.'},
+ {t:'7. НАБОТОТ', d:'Арча. Гулҳои кӯҳӣ. Алафҳои шифобахш.', voice:'Наботот. Арча. Гулҳои кӯҳӣ. Алафҳои шифобахш.'},
+ {t:'8. ХАТАР', d:'Агар сарбанд шиканад, 5 миллион одам дар хатар. Вале эҳтимол камтар аз 1 фоиз. Назорат ҳар рӯз!', voice:'Хатар. Агар сарбанд шиканад, 5 миллион одам дар хатар. Вале эҳтимол камтар аз як фоиз.'},
+ {t:'9. НАЗОРАТ', d:'Истгоҳи мушоҳидавӣ. Олимони тоҷик ва хориҷӣ. Системаи огоҳкунии бармаҳал.', voice:'Назорат. Истгоҳи мушоҳидавӣ. Олимони тоҷик ва хориҷӣ.'},
+ {t:'10. ЭНЕРГИЯ', d:'Оби Сарез = барқ. Барқи арзон барои Тоҷикистон.', voice:'Энергия. Оби Сарез барқ аст. Барқи арзон барои Тоҷикистон.'},
+ {t:'11. САЙЁҲӢ', d:'Сайёҳон аз Олмон, Фаронса, Ҷопон. Яке аз зеботарин ҷойҳои дунё!', voice:'Сайёҳӣ. Сайёҳон аз Олмон, Фаронса, Ҷопон. Яке аз зеботарин ҷойҳои дунё!'},
+ {t:'12. ХУЛОСА', d:'Сарез - сарвати миллӣ! Мо бояд онро ҳифз кунем! Ташаккур! Саволҳо?', voice:'Хулоса. Сарез сарвати миллӣ! Мо бояд онро ҳифз кунем! Ташаккур! Саволҳо?'}
+];
+function makeSarez(){
+ let out=document.getElementById('sarezOut');
+ out.innerHTML = SAREZ_DATA.map((s,i)=>'<div class="slide" id="slide'+i+'"><h2>'+s.t+'</h2><p style="font-size:18px;line-height:1.6">'+s.d+'</p><button class="btnVoice" onclick="speakSlide('+i+')">🔊 ИН ҚИСМРО ГӮШ КУН</button></div>').join('');
+ speak('Презентатсия тайёр шуд. 12 слайд.');
+}
+function speakSlide(i){ document.querySelectorAll('.slide').forEach(s=>s.classList.remove('active-slide')); let el=document.getElementById('slide'+i); if(el) el.classList.add('active-slide'); speak(SAREZ_DATA[i].voice); }
+let playIndex=0, playingAll=false;
+function playAll(){ if(document.getElementById('sarezOut').innerHTML==''){ makeSarez(); } playingAll=true; playIndex=0; playNext(); }
+function playNext(){ if(!playingAll) return; if(playIndex>=SAREZ_DATA.length){ playingAll=false; speak('Тамом шуд. Ташаккур!'); return; } speakSlide(playIndex); let check=setInterval(()=>{ if(!window.speechSynthesis.speaking && playingAll){ clearInterval(check); playIndex++; setTimeout(playNext, 600); } }, 500); }
+async function askAI(){ let inp=document.getElementById('q'); let qq=inp.value.trim(); if(!qq) return; let chat=document.getElementById('chat'); chat.innerHTML+='<div class="msg user">'+qq+'</div>'; let low=qq.toLowerCase(); let ans=''; if(low.includes('сарез')||low.includes('sarez')) ans='Кӯли Сарез: 60 км дарозӣ, 500 м чуқурӣ, 17 млрд м³ об, соли 1911 аз заминларза пайдо шудааст.'; else if(low.includes('салом')||low.includes('привет')||low.includes('hello')) ans='Салом Акбар!'; else if(/[0-9]/.test(qq) && /[+\-*/]/.test(qq)){ try{ ans=' = '+eval(qq); }catch(e){ ans='?'; } } else{ let wiki={tj:'tg',ru:'ru',en:'en',uz:'uz',fa:'fa',tr:'tr',zh:'zh'}[LANG]; try{ let r=await fetch('https://'+wiki+'.wikipedia.org/api/rest_v1/page/summary/'+encodeURIComponent(qq)); let j=await r.json(); ans=j.extract ? j.extract : 'Интернет нест!'; }catch(e){ ans='Интернет нест!'; } } chat.innerHTML+='<div class="msg ai">🤖 '+ans+'</div>'; inp.value=''; chat.scrollTop=chat.scrollHeight; speak(ans); }
+function solveMath(){ let v=document.getElementById('m').value; try{ let r=eval(v); document.getElementById('mRes').innerHTML='✅ '+v+' = <b style="color:green;font-size:28px">'+r+'</b>'; speak('Ҷавоб '+r); }catch(e){ document.getElementById('mRes').innerHTML='❌ 25*4+10 навиш'; } }
+let score=0, playing=false;
+function startGame(){ if(playing) return; playing=true; score=0; document.getElementById('sc').innerText=0; let area=document.getElementById('gameArea'); area.innerHTML=''; speak('Бозӣ оғоз шуд!'); let sp=setInterval(()=>{ if(!playing){clearInterval(sp); return;} let s=document.createElement('div'); s.className='star'; let bomb=Math.random()<0.25; s.innerText=bomb?'💣':'⭐'; s.style.left=Math.random()*85+'%'; s.style.top='0px'; s.onclick=()=>{ score+=bomb?-20:10; document.getElementById('sc').innerText=score; s.remove(); }; area.appendChild(s); let p=0; let f=setInterval(()=>{ p+=5; s.style.top=p+'px'; if(p>230){s.remove(); clearInterval(f);} },40); },650); setTimeout(()=>{playing=false; speak('Бозӣ тамом шуд. Холи шумо '+score); alert('Score: '+score);},20000); }
+async function makePrez(){ let t=document.getElementById('tema').value.trim() || 'Mening mavzuim'; let out=document.getElementById('prezOut'); out.innerHTML='<p>⏳...</p>'; let info=''; let wiki={tj:'tg',ru:'ru',en:'en',uz:'uz',fa:'fa',tr:'tr',zh:'zh'}[LANG]; try{ let r=await fetch('https://'+wiki+'.wikipedia.org/api/rest_v1/page/summary/'+encodeURIComponent(t)); let j=await r.json(); if(j.extract) info=j.extract; }catch(e){} if(!info) info=t+' - мавзӯи муҳим аст.'; out.innerHTML='<div class="slide"><h1>📊 '+t+'</h1><h3>Акбар | 2026</h3></div><div class="slide"><h2>1. Muqaddima</h2><p>'+info+'</p></div>'; speak('Презентатсияи '+t+' тайёр шуд.'); }
+</script>
+</body>
+</html>
